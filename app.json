@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "geo-notes",
+    "name": "GeoNotes",
     "slug": "geo-notes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "supportsTablet": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
