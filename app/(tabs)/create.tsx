@@ -1,8 +1,8 @@
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import { RelativePathString, router } from 'expo-router';
-import { useState } from 'react';
+import { RelativePathString, router, useFocusEffect } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -24,6 +24,31 @@ export default function Create() {
   );
   const [address, setAddress] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const firstFocus = useRef(true);
+
+  const resetForm = useCallback(() => {
+    setTitle('');
+    setBody('');
+    setImgUri(null);
+    setCoords(null);
+    setAddress(null);
+    setSaving(false);
+  }, []);
+
+  // clear the form only when the screen is entered again,
+  // not when temporary modals (camera/library) return
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) resetForm();
+      firstFocus.current = false;
+
+      // when leaving the screen, arm the next entry to reset
+      return () => {
+        firstFocus.current = true;
+      };
+    }, [resetForm]),
+  );
 
   async function pickFromCamera() {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
