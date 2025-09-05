@@ -1,5 +1,5 @@
 import type { Note } from '@/types';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { deleteNote, getNote } from '../../lib/db';
@@ -22,39 +22,47 @@ export default function NoteDetail() {
 
   if (!note) return null;
 
-  return (
-    <ScrollView className="flex-1 bg-white">
-      <Image
-        source={{ uri: note.photo_uri }}
-        className="h-64 w-full"
-      />
-      <View className="p-4">
-        <Text className="mb-1 text-2xl font-bold">{note.title}</Text>
-        <Text className="mb-2 text-xs text-slate-500">
-          {new Date(note.created_at).toLocaleString()}
-          {note.address ? ` • ${note.address}` : ''}
-        </Text>
-        <Text className="text-base leading-6">{note.body || '—'}</Text>
+  const headerTitle = note?.title
+    ? note.title.length > 40
+      ? note.title.slice(0, 40) + '…'
+      : note.title
+    : 'Note';
 
-        <Pressable
-          onPress={async () => {
-            Alert.alert('Delete note?', 'This action cannot be undone.', [
-              { text: 'Cancel', style: 'cancel' },
-              {
-                text: 'Delete',
-                style: 'destructive',
-                onPress: async () => {
-                  await deleteNote(note.id);
-                  router.back();
+  return (
+    <>
+      <Stack.Screen options={{ title: headerTitle }} />
+      <ScrollView className="flex-1 bg-white">
+        <Image
+          source={{ uri: note.photo_uri }}
+          className="h-64 w-full"
+        />
+        <View className="p-4">
+          <Text className="mb-2 text-xs text-slate-500">
+            {new Date(note.created_at).toLocaleString()}
+            {note.address ? ` • ${note.address}` : ''}
+          </Text>
+          <Text className="text-base leading-6">{note.body || '—'}</Text>
+
+          <Pressable
+            onPress={async () => {
+              Alert.alert('Delete note?', 'This action cannot be undone.', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await deleteNote(note.id);
+                    router.back();
+                  },
                 },
-              },
-            ]);
-          }}
-          className="mt-6 items-center rounded-xl bg-red-600 p-3"
-        >
-          <Text className="font-semibold text-white">Delete</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+              ]);
+            }}
+            className="mt-6 items-center rounded-xl bg-red-600 p-3"
+          >
+            <Text className="font-semibold text-white">Delete</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </>
   );
 }

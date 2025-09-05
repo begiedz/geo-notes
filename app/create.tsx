@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import uuid from 'react-native-uuid';
-import { insertNote } from '../../lib/db';
+import { insertNote } from '../lib/db';
 
 export default function Create() {
   const [title, setTitle] = useState('');
@@ -133,10 +133,6 @@ export default function Create() {
 
   return (
     <ScrollView className="flex-1 bg-white p-4">
-      <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-500">
-        New Note
-      </Text>
-
       <TextInput
         placeholder="Note title"
         value={title}

@@ -1,9 +1,10 @@
+import CreateButton from '@/components/createButton';
 import Note from '@/components/note';
 import type { Note as TNote } from '@/types';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Text, View } from 'react-native';
-import { getNotes, initDb } from '../../lib/db';
+import { getNotes, initDb } from '../lib/db';
 
 export default function Index() {
   const [notes, setNotes] = useState<TNote[]>([]);
@@ -57,6 +58,7 @@ export default function Index() {
         ItemSeparatorComponent={() => <View className="h-3" />}
         renderItem={({ item }) => <Note note={item} />}
       />
+      <CreateButton onPress={() => router.push('/create')} />
     </View>
   );
 }
