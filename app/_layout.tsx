@@ -2,17 +2,29 @@ import './global.css';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
+  const isDark = useColorScheme() === 'dark';
+  const headerBg = isDark ? '#0f172a' : '#ffffff'; // slate-900 / white
+  const headerText = isDark ? '#f8fafc' : '#0f172a'; // slate-50  / slate-900
+  const screenBg = isDark ? '#000000' : '#ffffff';
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <SafeAreaView
-        style={{ flex: 1 }}
+        className="flex-1 bg-white dark:bg-black"
         edges={['bottom']}
       >
-        <Stack>
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: headerBg },
+            headerTitleStyle: { color: headerText },
+            headerTintColor: headerText,
+            contentStyle: { backgroundColor: screenBg },
+          }}
+        >
           <Stack.Screen
             name="index"
             options={{ title: 'GeoNotes' }}

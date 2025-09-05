@@ -132,12 +132,12 @@ export default function Create() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white p-4">
+    <ScrollView className="flex-1 p-4">
       <TextInput
         placeholder="Note title"
         value={title}
         onChangeText={setTitle}
-        className="mb-3 rounded-xl border border-slate-300 px-3 py-2 text-base"
+        className="mb-3 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
       />
 
       {imgUri ? (
@@ -146,7 +146,7 @@ export default function Create() {
           className="mb-3 h-48 w-full rounded-xl"
         />
       ) : (
-        <View className="mb-3 h-48 w-full items-center justify-center rounded-xl border border-dashed border-slate-300">
+        <View className="mb-3 h-48 w-full items-center justify-center rounded-xl border border-dashed border-slate-500">
           <Text className="text-slate-500">No image selected</Text>
         </View>
       )}
@@ -154,13 +154,13 @@ export default function Create() {
       <View className="mb-3 flex-row gap-2">
         <Pressable
           onPress={pickFromCamera}
-          className="flex-1 items-center rounded-xl bg-blue-600 p-3"
+          className="flex-1 items-center rounded-xl bg-blue-600 dark:bg-blue-700 p-3"
         >
           <Text className="font-semibold text-white">Take photo</Text>
         </Pressable>
         <Pressable
           onPress={pickFromLibrary}
-          className="flex-1 items-center rounded-xl bg-blue-100 p-3"
+          className="flex-1 items-center rounded-xl bg-blue-100 dark:bg-blue-300 p-3"
         >
           <Text className="font-semibold text-blue-700">Choose</Text>
         </Pressable>
@@ -168,12 +168,12 @@ export default function Create() {
 
       <Pressable
         onPress={getCurrentLocation}
-        className="mb-3 items-center rounded-xl bg-emerald-600 p-3"
+        className="mb-3 items-center rounded-xl bg-emerald-600 dark:bg-emerald-700 p-3"
       >
         <Text className="font-semibold text-white">Use current location</Text>
       </Pressable>
 
-      <Text className="mb-2 text-sm text-slate-600">
+      <Text className="mb-2 text-sm text-slate-00">
         {coords
           ? `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`
           : 'Location not set'}
@@ -186,15 +186,15 @@ export default function Create() {
         textAlignVertical="top"
         value={body}
         onChangeText={setBody}
-        className="min-h-40 rounded-xl border border-slate-300 px-3 py-2 text-base"
+        className="min-h-40 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
       />
 
       <Pressable
         disabled={saving}
         onPress={save}
-        className="mt-4 items-center rounded-xl bg-black p-3 disabled:opacity-60"
+        className="mt-4 items-center rounded-xl bg-black dark:bg-slate-300 p-3 disabled:opacity-60"
       >
-        <Text className="font-semibold text-white">
+        <Text className="font-semibold text-white dark:text-black">
           {saving ? 'Saving…' : 'Save note'}
         </Text>
       </Pressable>

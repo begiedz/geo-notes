@@ -31,7 +31,7 @@ export default function NoteDetail() {
   return (
     <>
       <Stack.Screen options={{ title: headerTitle }} />
-      <ScrollView className="flex-1 bg-white">
+      <ScrollView className="flex-1 ">
         <Image
           source={{ uri: note.photo_uri }}
           className="h-64 w-full"
@@ -41,7 +41,9 @@ export default function NoteDetail() {
             {new Date(note.created_at).toLocaleString()}
             {note.address ? ` • ${note.address}` : ''}
           </Text>
-          <Text className="text-base leading-6">{note.body || '—'}</Text>
+          <Text className="text-base leading-6 dark:text-white">
+            {note.body || '—'}
+          </Text>
 
           <Pressable
             onPress={async () => {
