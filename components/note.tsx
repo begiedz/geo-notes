@@ -1,23 +1,26 @@
-import { Note } from '@/types';
-import { Link } from 'expo-router';
+import { Note as TNote } from '@/types';
+import { Link, RelativePathString } from 'expo-router';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 
-const note = ({ note }: { note: Note }) => {
+const Note = ({ note }: { note: TNote }) => {
   return (
     <Link
-      href={`/note/${note.id}`}
+      href={`/note/${note.id}` as RelativePathString}
       asChild
     >
       <Pressable className="flex-row items-center rounded-2xl border border-slate-200 bg-white p-12px p-3">
-        <Image className="h-12 w-12 rounded-lg" />
-        <Text>Image</Text>
+        <Image
+          source={{ uri: note.photo_uri }}
+          className="h-12 w-12 rounded-lg"
+        />
+
         <View className="mx-3 flex-1">
           <Text
             className="text-base font-semibold"
             numberOfLines={1}
           >
-            Title
+            {note.title}
           </Text>
           <Text
             className="text-xs text-slate-500"
@@ -33,4 +36,4 @@ const note = ({ note }: { note: Note }) => {
   );
 };
 
-export default note;
+export default Note;
