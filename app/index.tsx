@@ -34,7 +34,7 @@ export default function Index() {
 
   if (loading && notes.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 items-center justify-center">
         <Text className="text-base text-slate-600">Loading…</Text>
       </View>
     );
@@ -42,10 +42,12 @@ export default function Index() {
 
   if (!loading && notes.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-6">
-        <Text className="mb-2 text-xl font-semibold">Welcome to GeoNotes!</Text>
+      <View className="flex-1 items-center justify-center px-6">
+        <Text className="mb-2 text-xl font-semibold dark:text-white">
+          Welcome to GeoNotes!
+        </Text>
         <Text className="mb-4 text-center text-slate-600">
-          {`Tap "New Note" to create your first note.`}
+          {`Tap + to create your first note.`}
         </Text>
       </View>
     );
