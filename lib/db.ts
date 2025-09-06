@@ -44,6 +44,35 @@ export async function getNote(id: string): Promise<Note | undefined> {
   return row ? fromDbRow(row) : undefined;
 }
 
+export async function updateNote(input: {
+  id: string;
+  title: string;
+  body: string;
+  photo_uri: string;
+  address: string | null;
+  coordinates: { latitude: number; longitude: number } | null;
+}): Promise<void> {
+  await db.runAsync(
+    `UPDATE notes
+     SET title = $title,
+         body = $body,
+         photo_uri = $photo_uri,
+         address = $address,
+         latitude = $latitude,
+         longitude = $longitude
+     WHERE id = $id`,
+    {
+      $id: input.id,
+      $title: input.title,
+      $body: input.body,
+      $photo_uri: input.photo_uri,
+      $address: input.address ?? null,
+      $latitude: input.coordinates?.latitude ?? null,
+      $longitude: input.coordinates?.longitude ?? null,
+    },
+  );
+}
+
 export async function deleteNote(id: string): Promise<void> {
   await db.runAsync(`DELETE FROM notes WHERE id = ?`, [id]);
 }

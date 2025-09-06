@@ -9,12 +9,12 @@ export default function RootLayout() {
   const isDark = useColorScheme() === 'dark';
   const headerBg = isDark ? '#0f172a' : '#ffffff'; // slate-900 / white
   const headerText = isDark ? '#f8fafc' : '#0f172a'; // slate-50  / slate-900
-  const screenBg = isDark ? '#000000' : '#ffffff';
+  const screenBg = isDark ? '#000000' : '#f2f2f2';
   return (
     <>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <SafeAreaView
-        className="flex-1 bg-white dark:bg-black"
+        className="flex-1 dark:bg-black"
         edges={['bottom']}
       >
         <Stack

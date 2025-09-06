@@ -9,7 +9,7 @@ const Note = ({ note }: { note: TNote }) => {
       href={`/note/${note.id}` as RelativePathString}
       asChild
     >
-      <Pressable className="flex-row items-center rounded-2xl border border-slate-200 dark:border-slate-800  p-12px p-3">
+      <Pressable className="flex-row items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-12px p-3">
         <Image
           source={{ uri: note.photo_uri }}
           className="h-12 w-12 rounded-lg"
