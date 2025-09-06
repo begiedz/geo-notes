@@ -36,12 +36,12 @@ export async function getNotes(): Promise<Note[]> {
   return rows.map(fromDbRow);
 }
 
-export async function getNote(id: string): Promise<Note | undefined> {
+export async function getNote(id: string): Promise<Note | null> {
   const row = await db.getFirstAsync<any>(
     `SELECT * FROM notes WHERE id = ? LIMIT 1`,
     [id],
   );
-  return row ? fromDbRow(row) : undefined;
+  return row ? fromDbRow(row) : null;
 }
 
 export async function updateNote(input: {
