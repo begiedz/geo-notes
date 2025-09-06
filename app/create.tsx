@@ -13,7 +13,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import uuid from 'react-native-uuid';
+import { v7 as uuidv7 } from 'uuid';
 import { insertNote } from '../lib/db';
 
 export default function Create() {
@@ -100,7 +100,7 @@ export default function Create() {
 
     setSaving(true);
     try {
-      const id = String(uuid.v4());
+      const id = uuidv7();
       const dest = `${FileSystem.documentDirectory}${id}.jpg`;
       await FileSystem.copyAsync({ from: imgUri, to: dest });
 
