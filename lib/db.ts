@@ -1,5 +1,6 @@
-import type { Coordinates, Note } from '@/types';
 import * as SQLite from 'expo-sqlite';
+import type { Note } from '../types';
+import { fromDbRow, toDbParams } from './mappers';
 
 const db = SQLite.openDatabaseSync('geonotes_v2.db');
 
@@ -19,37 +20,12 @@ export async function initDb() {
   `);
 }
 
-function fromDbRow(row: any): Note {
-  const coordinates: Coordinates | null =
-    row.latitude !== null && row.longitude !== null
-      ? { latitude: row.latitude, longitude: row.longitude }
-      : null;
-
-  return {
-    id: row.id,
-    title: row.title,
-    body: row.body,
-    photo_uri: row.photo_uri,
-    created_at: row.created_at,
-    coordinates,
-    address: row.address,
-  };
-}
-
 export async function insertNote(note: Note): Promise<void> {
   await db.runAsync(
-    `INSERT INTO notes (id, title, body, photo_uri, created_at, latitude, longitude, address)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      note.id,
-      note.title,
-      note.body,
-      note.photo_uri,
-      note.created_at,
-      note.coordinates?.latitude ?? null,
-      note.coordinates?.longitude ?? null,
-      note.address,
-    ],
+    `INSERT INTO notes
+   (id, title, body, photo_uri, created_at, latitude, longitude, address)
+   VALUES ($id, $title, $body, $photo_uri, $created_at, $latitude, $longitude, $address)`,
+    toDbParams(note),
   );
 }
 

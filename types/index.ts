@@ -1,14 +1,22 @@
-export type Coordinates = {
-  latitude: number | null;
-  longitude: number | null;
-};
-
-export type Note = {
+export type NoteBase = {
   id: string;
   title: string;
   body: string;
   photo_uri: string;
   created_at: number;
-  coordinates: Coordinates | null;
   address: string | null;
+};
+
+export type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
+export type Note = NoteBase & {
+  coordinates: Coordinates | null;
+};
+
+export type DbRow = NoteBase & {
+  latitude: number | null;
+  longitude: number | null;
 };
