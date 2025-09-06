@@ -1,3 +1,4 @@
+import { Coordinates } from '@/types';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
@@ -19,9 +20,7 @@ export default function Create() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imgUri, setImgUri] = useState<string | null>(null);
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
-    null,
-  );
+  const [coords, setCoords] = useState<Coordinates | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -67,18 +66,22 @@ export default function Create() {
   async function getCurrentLocation() {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') return Alert.alert('Location permission denied');
+
     const pos = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });
+
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
-    setCoords({ lat, lon });
+
+    setCoords({ latitude: lat, longitude: lon });
 
     try {
       const rev = await Location.reverseGeocodeAsync({
         latitude: lat,
         longitude: lon,
       });
+
       const human = rev[0]
         ? [rev[0].name, rev[0].city || rev[0].subregion, rev[0].country]
             .filter(Boolean)
@@ -107,8 +110,7 @@ export default function Create() {
         body: body.trim(),
         photo_uri: dest,
         created_at: Date.now(),
-        lat: coords?.lat ?? null,
-        lon: coords?.lon ?? null,
+        coordinates: coords,
         address: address ?? null,
       });
 
@@ -118,8 +120,8 @@ export default function Create() {
         body,
         dest,
         Date.now(),
-        coords?.lat,
-        coords?.lon,
+        coords?.latitude,
+        coords?.longitude,
         address,
       );
 
@@ -175,7 +177,7 @@ export default function Create() {
 
       <Text className="mb-2 text-sm text-slate-00">
         {coords
-          ? `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`
+          ? `${coords.latitude!.toFixed(5)}, ${coords.longitude!.toFixed(5)}`
           : 'Location not set'}
         {address ? `  •  ${address}` : ''}
       </Text>

@@ -26,7 +26,15 @@ const Note = ({ note }: { note: TNote }) => {
             className="text-xs text-slate-500"
             numberOfLines={1}
           >
-            {new Date(note.created_at).toLocaleString()} •{' '}
+            {new Date(note.created_at).toLocaleString()}
+            {note.coordinates
+              ? ` • ${note.coordinates.latitude}, ${note.coordinates.longitude}`
+              : ''}
+          </Text>
+          <Text
+            className="text-xs text-slate-500"
+            numberOfLines={1}
+          >
             {note.address ?? 'No address'}
           </Text>
         </View>

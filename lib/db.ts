@@ -1,7 +1,7 @@
-import type { Note } from '@/types';
+import type { Coordinates, Note } from '@/types';
 import * as SQLite from 'expo-sqlite';
 
-const db = SQLite.openDatabaseSync('geonotes.db');
+const db = SQLite.openDatabaseSync('geonotes_v2.db');
 
 // init db once - at app start
 export async function initDb() {
@@ -12,16 +12,33 @@ export async function initDb() {
       body TEXT NOT NULL,
       photo_uri TEXT NOT NULL,
       created_at INTEGER NOT NULL,
-      lat REAL,
-      lon REAL,
+      latitude REAL,
+      longitude REAL,
       address TEXT
     );
   `);
 }
 
+function fromDbRow(row: any): Note {
+  const coordinates: Coordinates | null =
+    row.latitude !== null && row.longitude !== null
+      ? { latitude: row.latitude, longitude: row.longitude }
+      : null;
+
+  return {
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    photo_uri: row.photo_uri,
+    created_at: row.created_at,
+    coordinates,
+    address: row.address,
+  };
+}
+
 export async function insertNote(note: Note): Promise<void> {
   await db.runAsync(
-    `INSERT INTO notes (id, title, body, photo_uri, created_at, lat, lon, address)
+    `INSERT INTO notes (id, title, body, photo_uri, created_at, latitude, longitude, address)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       note.id,
@@ -29,23 +46,26 @@ export async function insertNote(note: Note): Promise<void> {
       note.body,
       note.photo_uri,
       note.created_at,
-      note.lat,
-      note.lon,
+      note.coordinates?.latitude ?? null,
+      note.coordinates?.longitude ?? null,
       note.address,
     ],
   );
 }
 
 export async function getNotes(): Promise<Note[]> {
-  return db.getAllAsync<Note>(`SELECT * FROM notes ORDER BY created_at DESC`);
+  const rows = await db.getAllAsync<any>(
+    `SELECT * FROM notes ORDER BY created_at DESC`,
+  );
+  return rows.map(fromDbRow);
 }
 
 export async function getNote(id: string): Promise<Note | undefined> {
-  const result = await db.getFirstAsync<Note>(
+  const row = await db.getFirstAsync<any>(
     `SELECT * FROM notes WHERE id = ? LIMIT 1`,
     [id],
   );
-  return result === null ? undefined : result;
+  return row ? fromDbRow(row) : undefined;
 }
 
 export async function deleteNote(id: string): Promise<void> {

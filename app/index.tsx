@@ -32,34 +32,29 @@ export default function Index() {
     }, [load]),
   );
 
-  if (loading && notes.length === 0) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-base text-slate-600">Loading…</Text>
-      </View>
-    );
-  }
-
-  if (!loading && notes.length === 0) {
-    return (
-      <View className="flex-1 items-center justify-center px-6">
-        <Text className="mb-2 text-xl font-semibold dark:text-white">
-          Welcome to GeoNotes!
-        </Text>
-        <Text className="mb-4 text-center text-slate-600">
-          {`Tap + to create your first note.`}
-        </Text>
-      </View>
-    );
-  }
   return (
-    <View className="flex-1 ">
-      <FlatList
-        data={notes}
-        contentContainerStyle={{ padding: 12 }}
-        ItemSeparatorComponent={() => <View className="h-3" />}
-        renderItem={({ item }) => <Note note={item} />}
-      />
+    <View className="flex-1">
+      {loading && notes.length === 0 ? (
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-base text-slate-600">Loading…</Text>
+        </View>
+      ) : !loading && notes.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="mb-2 text-xl font-semibold dark:text-white">
+            Welcome to GeoNotes!
+          </Text>
+          <Text className="mb-4 text-center text-slate-600">
+            {`Tap + to create your first note.`}
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={notes}
+          contentContainerStyle={{ padding: 12 }}
+          ItemSeparatorComponent={() => <View className="h-3" />}
+          renderItem={({ item }) => <Note note={item} />}
+        />
+      )}
       <CreateButton onPress={() => router.push('/create')} />
     </View>
   );

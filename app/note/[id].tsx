@@ -39,7 +39,12 @@ export default function NoteDetail() {
         <View className="p-4">
           <Text className="mb-2 text-xs text-slate-500">
             {new Date(note.created_at).toLocaleString()}
-            {note.address ? ` • ${note.address}` : ''}
+            {note.coordinates
+              ? ` • ${note.coordinates.latitude}, ${note.coordinates.longitude}`
+              : ''}
+          </Text>
+          <Text className="mb-2 text-xs text-slate-500">
+            {note.address ? note.address : ''}
           </Text>
           <Text className="text-base leading-6 dark:text-white">
             {note.body || '—'}
