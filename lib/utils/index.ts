@@ -24,7 +24,7 @@ export async function pickImageFromCamera() {
   }
   const result = await ImagePicker.launchCameraAsync({
     quality: 0.7,
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: 'images',
   });
   return !result.canceled && result.assets?.[0]?.uri
     ? result.assets[0].uri
@@ -39,7 +39,7 @@ export async function pickImageFromLibrary() {
   }
   const result = await ImagePicker.launchImageLibraryAsync({
     quality: 0.7,
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: 'images',
   });
   return !result.canceled && result.assets?.[0]?.uri
     ? result.assets[0].uri
