@@ -5,6 +5,7 @@ You are assisting in a React Native + Expo project called **GeoNotes**. Your pri
 ## Goals
 
 - MVP first: create/edit/delete notes with photo + location + address.
+- It's an Android only application.
 - Keep code explicit and boring. No magic abstractions.
 - Strong typing (TypeScript), predictable modules, small files.
 

@@ -6,7 +6,7 @@ import {
 } from '@/lib/utils';
 import type { Coordinates, Note } from '@/types';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -28,6 +28,7 @@ export default function EditNote() {
   const [photoUri, setPhotoUri] = useState<string>('');
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     (async () => {
@@ -121,8 +122,21 @@ export default function EditNote() {
           ),
         }}
       />
-      <KeyboardAvoidingView className="flex-1">
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior="padding"
+        keyboardVerticalOffset={80}
+      >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: 16,
+            paddingBottom: 32,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View className="mb-4">
             <Text className="mb-2 text-xs text-slate-500">Photo</Text>
             {photoUri ? (
@@ -168,8 +182,14 @@ export default function EditNote() {
               onChangeText={setBody}
               placeholder="Write your note..."
               multiline
+              scrollEnabled={true}
               textAlignVertical="top"
               className="min-h-40 rounded-xl border border-slate-300 p-3 dark:border-slate-700 dark:text-white"
+              onFocus={() => {
+                setTimeout(() => {
+                  scrollRef.current?.scrollToEnd({ animated: true });
+                }, 300);
+              }}
             />
           </View>
 

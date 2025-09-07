@@ -11,6 +11,7 @@ import { useCallback, useRef, useState } from 'react';
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
   Text,
@@ -29,6 +30,7 @@ export default function Create() {
   const [saving, setSaving] = useState(false);
 
   const firstFocusRef = useRef(true);
+  const scrollRef = useRef<ScrollView>(null);
 
   const resetForm = useCallback(() => {
     setTitle('');
@@ -131,63 +133,83 @@ export default function Create() {
           ),
         }}
       />
-      <ScrollView className="flex-1 p-4">
-        <TextInput
-          placeholder="Note title"
-          value={title}
-          onChangeText={setTitle}
-          className="mb-3 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
-        />
-
-        {imageUri ? (
-          <Image
-            source={{ uri: imageUri }}
-            className="mb-3 h-48 w-full rounded-xl"
-          />
-        ) : (
-          <View className="mb-3 h-48 w-full items-center justify-center rounded-xl border border-dashed border-slate-500">
-            <Text className="text-slate-500">No image selected</Text>
-          </View>
-        )}
-
-        <View className="mb-3 flex-row gap-2">
-          <Pressable
-            onPress={onPickFromCamera}
-            className="flex-1 items-center rounded-xl bg-blue-600 dark:bg-blue-700 p-3"
-          >
-            <Text className="font-semibold text-white">Take photo</Text>
-          </Pressable>
-          <Pressable
-            onPress={onPickFromLibrary}
-            className="flex-1 items-center rounded-xl bg-blue-100 dark:bg-blue-300 p-3"
-          >
-            <Text className="font-semibold text-blue-700">Choose</Text>
-          </Pressable>
-        </View>
-
-        <Pressable
-          onPress={onGetCurrentLocation}
-          className="mb-3 items-center rounded-xl bg-emerald-600 dark:bg-emerald-700 p-3"
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior="padding"
+        keyboardVerticalOffset={80}
+      >
+        <ScrollView
+          ref={scrollRef}
+          className="flex-1 p-4"
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text className="font-semibold text-white">Use current location</Text>
-        </Pressable>
+          <TextInput
+            placeholder="Note title"
+            value={title}
+            onChangeText={setTitle}
+            className="mb-3 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
+          />
 
-        <Text className="mb-2 text-sm text-slate-600">
-          {coordinates
-            ? `${coordinates.latitude.toFixed(5)}, ${coordinates.longitude.toFixed(5)}`
-            : 'Location not set'}
-          {address ? `  •  ${address}` : ''}
-        </Text>
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              className="mb-3 h-48 w-full rounded-xl"
+            />
+          ) : (
+            <View className="mb-3 h-48 w-full items-center justify-center rounded-xl border border-dashed border-slate-500">
+              <Text className="text-slate-500">No image selected</Text>
+            </View>
+          )}
 
-        <TextInput
-          placeholder="Write your note…"
-          multiline
-          textAlignVertical="top"
-          value={body}
-          onChangeText={setBody}
-          className="min-h-40 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
-        />
-      </ScrollView>
+          <View className="mb-3 flex-row gap-2">
+            <Pressable
+              onPress={onPickFromCamera}
+              className="flex-1 items-center rounded-xl bg-blue-600 dark:bg-blue-700 p-3"
+            >
+              <Text className="font-semibold text-white">Take photo</Text>
+            </Pressable>
+            <Pressable
+              onPress={onPickFromLibrary}
+              className="flex-1 items-center rounded-xl bg-blue-100 dark:bg-blue-300 p-3"
+            >
+              <Text className="font-semibold text-blue-700">Choose</Text>
+            </Pressable>
+          </View>
+
+          <Pressable
+            onPress={onGetCurrentLocation}
+            className="mb-3 items-center rounded-xl bg-emerald-600 dark:bg-emerald-700 p-3"
+          >
+            <Text className="font-semibold text-white">
+              Use current location
+            </Text>
+          </Pressable>
+
+          <Text className="mb-2 text-sm text-slate-600">
+            {coordinates
+              ? `${coordinates.latitude.toFixed(5)}, ${coordinates.longitude.toFixed(5)}`
+              : 'Location not set'}
+            {address ? `  •  ${address}` : ''}
+          </Text>
+
+          <TextInput
+            placeholder="Write your note…"
+            multiline
+            scrollEnabled={true}
+            textAlignVertical="top"
+            value={body}
+            onChangeText={setBody}
+            className="min-h-40 rounded-xl border border-slate-500 dark:text-white px-3 py-2 text-base placeholder:text-slate-500"
+            onFocus={() => {
+              setTimeout(() => {
+                scrollRef.current?.scrollToEnd({ animated: true });
+              }, 300);
+            }}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }
