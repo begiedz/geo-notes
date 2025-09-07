@@ -9,7 +9,15 @@ import {
   useLocalSearchParams,
 } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
 import { getNote } from '../../lib/db';
 
@@ -17,6 +25,8 @@ export default function NoteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [note, setNote] = useState<Note | null>(null);
   const [imageOpen, setImageOpen] = useState(false);
+
+  const isDark = useColorScheme() === 'dark';
 
   const load = useCallback(async () => {
     try {
@@ -89,6 +99,7 @@ export default function NoteDetail() {
               <Ionicons
                 name="ellipsis-vertical"
                 size={20}
+                color={isDark ? '#fff' : '#111'}
               />
             </Pressable>
           ),

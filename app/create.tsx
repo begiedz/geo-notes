@@ -166,13 +166,13 @@ export default function Create() {
           <View className="mb-3 flex-row gap-2">
             <Pressable
               onPress={onPickFromCamera}
-              className="flex-1 items-center rounded-xl bg-blue-600 dark:bg-blue-700 p-3"
+              className="flex-1 items-center rounded-xl bg-blue-600 p-3"
             >
               <Text className="font-semibold text-white">Take photo</Text>
             </Pressable>
             <Pressable
               onPress={onPickFromLibrary}
-              className="flex-1 items-center rounded-xl bg-blue-100 dark:bg-blue-300 p-3"
+              className="flex-1 items-center rounded-xl bg-blue-100 p-3"
             >
               <Text className="font-semibold text-blue-700">Choose</Text>
             </Pressable>
