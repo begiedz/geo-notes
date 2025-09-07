@@ -20,3 +20,5 @@ export type DbRow = NoteBase & {
   latitude: number | null;
   longitude: number | null;
 };
+
+export type Section = { title: string; data: Note[] };

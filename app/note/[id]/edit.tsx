@@ -1,10 +1,13 @@
+import { getNote, updateNote } from '@/lib/db';
 import {
   getCurrentCoordinatesAndAddress,
   pickImageFromCamera,
   pickImageFromLibrary,
   replaceImageInDocumentDirectory,
 } from '@/lib/utils';
+import { isPinned, setPinned } from '@/lib/utils/pins';
 import type { Coordinates, Note } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -15,12 +18,14 @@ import {
   ScrollView,
   Text,
   TextInput,
+  useColorScheme,
   View,
 } from 'react-native';
-import { getNote, updateNote } from '../../../lib/db';
 
 export default function EditNote() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -28,6 +33,8 @@ export default function EditNote() {
   const [photoUri, setPhotoUri] = useState<string>('');
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const [pinned, setPinnedState] = useState(false);
+
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -44,6 +51,7 @@ export default function EditNote() {
         setPhotoUri(existing.photo_uri);
         setCoordinates(existing.coordinates);
         setAddress(existing.address);
+        setPinnedState(await isPinned(existing.id));
       } catch (error: any) {
         Alert.alert('Error', error?.message ?? String(error));
       }
@@ -73,6 +81,13 @@ export default function EditNote() {
   const onClearLocation = () => {
     setCoordinates(null);
     setAddress(null);
+  };
+
+  const onTogglePin = async () => {
+    if (!note) return;
+    const next = !pinned;
+    await setPinned(note.id, next);
+    setPinnedState(next);
   };
 
   const onSave = async () => {
@@ -113,15 +128,46 @@ export default function EditNote() {
         options={{
           title: 'Edit note',
           headerRight: () => (
-            <Pressable
-              onPress={onSave}
-              className="rounded-xl bg-blue-600 px-3 py-1.5"
-            >
-              <Text className="font-semibold text-white">Save</Text>
-            </Pressable>
+            <View className="flex-row items-center gap-2">
+              <Pressable
+                onPress={onTogglePin}
+                className={`rounded-xl px-3 py-1.5 border ${
+                  pinned
+                    ? 'border-amber-500 dark:border-amber-400'
+                    : 'border-slate-300 dark:border-slate-600'
+                }`}
+              >
+                <View className="flex-row items-center gap-1.5">
+                  <Ionicons
+                    name={pinned ? 'star' : 'star-outline'}
+                    size={16}
+                    color={
+                      pinned
+                        ? isDark
+                          ? '#fbbf24'
+                          : '#f59e0b' // amber-400/500
+                        : isDark
+                          ? '#e5e7eb'
+                          : '#0f172a' // slate-200 / slate-900
+                    }
+                  />
+                  <Text className="dark:text-white">
+                    {pinned ? 'Pinned' : 'Pin'}
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                onPress={onSave}
+                className="rounded-xl bg-blue-600 px-3 py-1.5"
+              >
+                <Text className="font-semibold text-white">Save</Text>
+              </Pressable>
+            </View>
           ),
         }}
       />
+
       <KeyboardAvoidingView
         className="flex-1"
         behavior="padding"
