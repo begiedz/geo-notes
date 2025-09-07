@@ -2,6 +2,7 @@ import type { Coordinates } from '@/types';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
+import { deleteNote, getNote } from '../db';
 
 export function formatAddress(address?: Location.LocationGeocodedAddress) {
   if (!address) return '';
@@ -109,4 +110,26 @@ export async function replaceImageInDocumentDirectory(params: {
   const destination = `${directory}${filenamePrefix}-${Date.now()}${extension}`;
   await FileSystem.copyAsync({ from: newImageSourceUri, to: destination });
   return destination;
+}
+
+export async function deleteNoteAndImage(id: string) {
+  try {
+    const note = await getNote(id);
+
+    if (
+      note?.photo_uri &&
+      note.photo_uri.startsWith(FileSystem.documentDirectory!)
+    ) {
+      try {
+        const info = await FileSystem.getInfoAsync(note.photo_uri);
+        if (info.exists) {
+          await FileSystem.deleteAsync(note.photo_uri, { idempotent: true });
+        }
+      } catch {}
+    }
+
+    await deleteNote(id);
+  } catch (err) {
+    throw err;
+  }
 }

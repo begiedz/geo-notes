@@ -1,3 +1,4 @@
+import { deleteNoteAndImage } from '@/lib/utils';
 import type { Note } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -9,7 +10,7 @@ import {
 } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { deleteNote, getNote } from '../../lib/db';
+import { getNote } from '../../lib/db';
 
 export default function NoteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,8 +58,12 @@ export default function NoteDetail() {
               text: 'Delete',
               style: 'destructive',
               onPress: async () => {
-                await deleteNote(note.id);
-                router.back();
+                try {
+                  await deleteNoteAndImage(note.id);
+                  router.back();
+                } catch (e: any) {
+                  Alert.alert('Error', e?.message ?? String(e));
+                }
               },
             },
           ]);
