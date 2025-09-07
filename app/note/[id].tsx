@@ -10,11 +10,13 @@ import {
 } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import ImageViewing from 'react-native-image-viewing';
 import { getNote } from '../../lib/db';
 
 export default function NoteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [note, setNote] = useState<Note | null>(null);
+  const [imageOpen, setImageOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -92,11 +94,15 @@ export default function NoteDetail() {
           ),
         }}
       />
+
       <ScrollView className="flex-1">
-        <Image
-          source={{ uri: note.photo_uri }}
-          className="h-64 w-full"
-        />
+        <Pressable onPress={() => setImageOpen(true)}>
+          <Image
+            source={{ uri: note.photo_uri }}
+            className="h-64 w-full"
+          />
+        </Pressable>
+
         <View className="p-4">
           <Text className="mb-2 text-xs text-slate-500">
             {new Date(note.created_at).toLocaleString()}
@@ -112,6 +118,29 @@ export default function NoteDetail() {
           </Text>
         </View>
       </ScrollView>
+
+      <ImageViewing
+        images={[{ uri: note.photo_uri }]}
+        imageIndex={0}
+        visible={imageOpen}
+        onRequestClose={() => setImageOpen(false)}
+        swipeToCloseEnabled
+        HeaderComponent={() => (
+          <View style={{ position: 'absolute', top: 12, right: 12 }}>
+            <Pressable
+              onPress={() => setImageOpen(false)}
+              hitSlop={10}
+              style={{ padding: 8 }}
+            >
+              <Ionicons
+                name="close"
+                size={28}
+                color="#fff"
+              />
+            </Pressable>
+          </View>
+        )}
+      />
     </>
   );
 }

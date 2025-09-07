@@ -3,6 +3,7 @@ import './global.css';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
@@ -11,7 +12,7 @@ export default function RootLayout() {
   const headerText = isDark ? '#f8fafc' : '#0f172a'; // slate-50  / slate-900
   const screenBg = isDark ? '#000000' : '#f2f2f2';
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <SafeAreaView
         className="flex-1 dark:bg-black"
@@ -40,6 +41,6 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
         </Stack>
       </SafeAreaView>
-    </>
+    </GestureHandlerRootView>
   );
 }
