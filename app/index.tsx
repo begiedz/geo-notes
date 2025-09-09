@@ -1,24 +1,19 @@
 import CreateButton from '@/components/createButton';
+import EmptyListScreen from '@/components/emptyListScreen';
 import Note from '@/components/note';
+import SectionHeader from '@/components/sectionHeader';
 import { clearMissingPins, getPinnedSet } from '@/lib/pins';
-import type { Section, Note as TNote } from '@/types';
+import type { Note as TNote } from '@/types';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Alert,
-  RefreshControl,
-  SectionList,
-  SectionListData,
-  SectionListRenderItemInfo,
-  Text,
-  View,
-} from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { getNotes, initDb } from '../lib/db';
 
 export default function Index() {
   const [notes, setNotes] = useState<TNote[]>([]);
   const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const booted = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -26,7 +21,7 @@ export default function Index() {
       const data = await getNotes();
       setNotes(data);
 
-      await clearMissingPins(data.map(note => note.id));
+      await clearMissingPins(data.map(n => n.id));
       const pins = await getPinnedSet();
       setPinnedIds(pins);
     } catch (e: any) {
@@ -36,76 +31,60 @@ export default function Index() {
     }
   }, []);
 
-  // init DB exactly once
+  // bootstrap: DB -> load
   useEffect(() => {
-    initDb().catch(() => {});
-  }, []);
+    if (booted.current) return;
+    booted.current = true;
+    (async () => {
+      try {
+        setLoading(true);
+        await initDb();
+        await load();
+      } catch {}
+    })();
+  }, [load]);
 
+  // refresh on screen focus
   useFocusEffect(
     useCallback(() => {
       load();
     }, [load]),
   );
 
-  const pinned = notes.filter(note => pinnedIds.has(note.id));
-  const others = notes.filter(note => !pinnedIds.has(note.id));
+  const pinned = notes.filter(n => pinnedIds.has(n.id));
+  const general = notes.filter(n => !pinnedIds.has(n.id));
 
-  const sections: Section[] =
-    pinned.length > 0
-      ? [
-          { title: 'Pinned', data: pinned },
-          { title: 'Others', data: others },
-        ]
-      : [{ title: 'Notes', data: others }];
+  if (!loading && pinned.length === 0 && general.length === 0) {
+    return (
+      <View className="flex-1">
+        <FlatList
+          data={[]}
+          ListEmptyComponent={EmptyListScreen}
+          contentContainerStyle={{ padding: 12, flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={load}
+            />
+          }
+          keyExtractor={() => 'empty'}
+          renderItem={null}
+        />
+        <CreateButton onPress={() => router.push('/create')} />
+      </View>
+    );
+  }
 
-  const Empty = (
-    <View className="flex-1 items-center justify-center px-6">
-      <Text className="mb-2 text-xl font-semibold dark:text-white">
-        Welcome to GeoNotes!
-      </Text>
-      <Text className="mb-4 text-center text-slate-600">
-        Tap + to create your first note.
-      </Text>
-    </View>
-  );
-
-  const renderItem = ({ item }: SectionListRenderItemInfo<TNote, Section>) => (
-    <View className="mb-3">
-      <Note note={item} />
-    </View>
-  );
-
-  const renderSectionHeader = ({
-    section,
-  }: {
-    section: SectionListData<TNote, Section>;
-  }) => (
-    <View className="px-3 py-2">
-      <Text className="text-xs font-semibold uppercase text-slate-500">
-        {section.title}
-      </Text>
-    </View>
-  );
-
-  return (
-    <View className="flex-1">
-      {loading && notes.length === 0 ? (
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-base text-slate-600">Loading…</Text>
-        </View>
-      ) : (
-        <SectionList
-          sections={sections}
+  if (pinned.length === 0) {
+    return (
+      <View className="flex-1">
+        <FlatList
+          data={general}
           keyExtractor={item => item.id}
-          contentContainerStyle={{
-            padding: 12,
-            paddingBottom: 24,
-            flexGrow: sections[0].data.length ? 0 : 1,
-          }}
-          renderItem={renderItem}
-          renderSectionHeader={renderSectionHeader}
-          stickySectionHeadersEnabled={false}
-          ListEmptyComponent={Empty}
+          renderItem={({ item }) => <Note note={item} />}
+          ItemSeparatorComponent={() => <View className="h-3" />}
+          ListHeaderComponent={<SectionHeader title="Notes" />}
+          contentContainerStyle={{ padding: 12, paddingTop: 0 }}
           refreshControl={
             <RefreshControl
               refreshing={loading}
@@ -113,7 +92,48 @@ export default function Index() {
             />
           }
         />
-      )}
+        <CreateButton onPress={() => router.push('/create')} />
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1">
+      <FlatList
+        data={pinned}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => <Note note={item} />}
+        ItemSeparatorComponent={() => <View className="h-3" />}
+        ListHeaderComponent={<SectionHeader title="Pinned" />}
+        ListFooterComponent={
+          <>
+            {general.length > 0 && (
+              <>
+                <SectionHeader title="General" />
+                <FlatList
+                  scrollEnabled={false}
+                  data={general}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => <Note note={item} />}
+                  ItemSeparatorComponent={() => <View className="h-3" />}
+                  contentContainerStyle={{ paddingTop: 0 }}
+                />
+              </>
+            )}
+          </>
+        }
+        contentContainerStyle={{
+          padding: 12,
+          paddingTop: 0,
+          paddingBottom: 24,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={load}
+          />
+        }
+      />
       <CreateButton onPress={() => router.push('/create')} />
     </View>
   );
