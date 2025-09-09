@@ -1,11 +1,11 @@
 import { getNote, updateNote } from '@/lib/db';
+import { isPinned, setPinned } from '@/lib/pins';
 import {
   getCurrentCoordinatesAndAddress,
   pickImageFromCamera,
   pickImageFromLibrary,
   replaceImageInDocumentDirectory,
 } from '@/lib/utils';
-import { isPinned, setPinned } from '@/lib/utils/pins';
 import type { Coordinates, Note } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';

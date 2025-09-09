@@ -1,5 +1,6 @@
 import CreateButton from '@/components/createButton';
 import Note from '@/components/note';
+import { clearMissingPins, getPinnedSet } from '@/lib/pins';
 import type { Section, Note as TNote } from '@/types';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,7 +14,6 @@ import {
   View,
 } from 'react-native';
 import { getNotes, initDb } from '../lib/db';
-import { clearMissingPins, getPinnedSet } from '../lib/utils/pins';
 
 export default function Index() {
   const [notes, setNotes] = useState<TNote[]>([]);
